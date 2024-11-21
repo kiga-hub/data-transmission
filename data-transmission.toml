@@ -1,0 +1,17 @@
+[basic]
+zone = "default"
+service = "data-transmission"
+apiport = 8888
+apiroot = "/api/data/v1"
+inswarm = false
+dynamicconfig = false
+prof = false
+devmode = false
+
+[log]
+level = "INFO"
+path = ""
+fields = ""
+
+[transmission]
+dir = "/data/transmission"

@@ -1,0 +1,18 @@
+[
+    {
+        "key": "port",
+        "value": "32072"
+    },
+    {
+        "key": "user",
+        "value": "root"
+    },
+    {
+        "key": "password",
+        "value": "123456"
+    },
+    {
+        "key": "database",
+        "value": "test"
+    }
+]
