@@ -1,36 +1,5 @@
 import axios from '@/libs/api.request'
 
-export const runAnsible = (data) => {
-  return axios.request({
-    url: '/task',
-    method: 'post',
-    data: data
-  })
-}
-
-export const getList = () => {
-  return axios.request({
-    url: '/task/list',
-    method: 'get'
-  })
-}
-
-export const deleteTask = (query) => {
-  return axios.request({
-    url: '/task/delete',
-    method: 'delete',
-    params: query
-  })
-}
-
-export const getTask = (query) => {
-  return axios.request({
-    url: '/task/detail',
-    method: 'get',
-    params: query
-  })
-}
-
 export const updateModelList = (query) => {
   return axios.request({
     url: '/upgrade/update_list',
@@ -41,7 +10,7 @@ export const updateModelList = (query) => {
 
 export const getModelList = () => {
   return axios.request({
-    url: '/upgrade/model_list',
+    url: '/upgrade/source_list',
     method: 'get'
   })
 }

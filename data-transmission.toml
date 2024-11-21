@@ -14,4 +14,4 @@ path = ""
 fields = ""
 
 [transmission]
-dir = "/data/transmission"
+dir = "/home/tmp"

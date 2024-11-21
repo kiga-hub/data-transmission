@@ -50,7 +50,7 @@ func (s *Client) GetModelList() ([]*SourceConfig, error) {
 func (s *Client) StartUpgrade(param *Req) error {
 
 	s.logger.Info("start upgrade param: ", param)
-	deployDir := s.config.Dir
+	upgradeDir := s.config.Dir
 	remoteTarget, err := NewRemoteTarget(param, s.logger)
 	if err != nil {
 		s.logger.Errorf("Failed to create SSH client at target IP: %v", err)
@@ -59,7 +59,7 @@ func (s *Client) StartUpgrade(param *Req) error {
 
 	defer remoteTarget.Close()
 
-	err = remoteTarget.CheckRemoteDirectory(deployDir)
+	err = remoteTarget.CheckRemoteDirectory(upgradeDir)
 	if err != nil {
 		remoteTarget.redirect.Printf("Failed to check remote directory: %v", err)
 		s.logger.Info("err: ", err)
@@ -76,7 +76,7 @@ func (s *Client) StartUpgrade(param *Req) error {
 
 	s.logger.Info("source: ", sourceConfig)
 
-	remoteTargetModelLibPath := path.Join(deployDir, path.Base(sourceConfig.Source))
+	remoteTargetModelLibPath := path.Join(upgradeDir, path.Base(sourceConfig.Source))
 
 	remoteTarget.redirect.Printf("\nremoteTargetModelLibPath: %s\n", remoteTargetModelLibPath)
 	s.logger.Infof("remoteTargetModelLibPath: %s\n", remoteTargetModelLibPath)
@@ -85,7 +85,7 @@ func (s *Client) StartUpgrade(param *Req) error {
 
 	/*--------------------download file------------------------*/
 
-	err = remoteTarget.DownloadTarball2Remote(remoteModelLibFile, deployDir)
+	err = remoteTarget.DownloadTarball2Remote(remoteModelLibFile, upgradeDir)
 	if err != nil {
 		remoteTarget.redirect.Printf("Failed to download %s tarball to remote: %v", remoteModelLibFile, err)
 		s.logger.Info("err: ", err)
@@ -97,9 +97,9 @@ func (s *Client) StartUpgrade(param *Req) error {
 
 	/*---------------------extract tarball and backup the preversion file ----------------------*/
 
-	backUpDir := path.Join(deployDir, "old")
+	backUpDir := path.Join(upgradeDir, "old")
 	// model lib
-	err = remoteTarget.UpgradeRemoteModels(remoteTargetModelLibPath, deployDir, backUpDir)
+	err = remoteTarget.UpgradeRemoteModels(remoteTargetModelLibPath, upgradeDir, backUpDir)
 	if err != nil {
 		remoteTarget.redirect.Printf("Failed to upgrade models: %v", err)
 		s.logger.Info("err: ", err)
@@ -108,7 +108,7 @@ func (s *Client) StartUpgrade(param *Req) error {
 
 	/*---------------------import mysql script-----------------------*/
 
-	// mysqlImage := "harbor.aithu.com:80/middleware/mysql:5.7"
+	// mysqlImage := "mysql:5.7"
 	// mysqlContainerID, err := remoteTarget.CheckRemoteRunningContainer(mysqlImage)
 	// if err != nil {
 	// 	fs.logger.Info("Error checking MySQL container:", err)
@@ -139,7 +139,7 @@ func (s *Client) StartUpgrade(param *Req) error {
 		return err
 	}
 
-	/*----------------------start tritonserver----------------------*/
+	/*----------------------start container----------------------*/
 
 	// // start the container
 	// err = remoteTarget.StartRemoteContainer(*sourceConfig)

@@ -1,6 +1,6 @@
 package utils
 
-// JSONResult 用于返回ajax请求的基类
+// JSONResult -
 type JSONResult struct {
 	Code   Code        `json:"code"`
 	Msg    Msg         `json:"msg"`

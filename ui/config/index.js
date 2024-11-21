@@ -13,7 +13,7 @@ module.exports = {
     proxyTable: {
       // 跨域配置, 添加完配置需要重新运行，才能生效
       '/api': {
-        target: 'http://192.168.8.244:8888/api/deploy/v1',
+        target: 'http://192.168.8.244:8888/api/data/v1',
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''

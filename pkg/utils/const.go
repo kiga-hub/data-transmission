@@ -41,20 +41,3 @@ const (
 	// ErrCodeParseMsg -
 	ErrCodeParseMsg Msg = "解析错误"
 )
-
-const (
-	// TaskDirName          - 任务目录，结果文件目录
-	TaskDirName = "task"
-	// MirrorDirName          - 镜像目录
-	MirrorDirName = "mirror"
-	// RpmDirName          - 基础安装包目录
-	RpmDirName = "rpm"
-	// ConfigMapDirName          - 配置映射
-	ConfigMapDirName = "config_maps"
-	// ConfigWorkDirName          - 加载工作
-	ConfigWorkDirName = "load_works"
-	// AppDirName          - 应用
-	AppDirName = "application"
-	// PlatformDirName          - 平台
-	PlatformDirName = "platform"
-)

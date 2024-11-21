@@ -25,14 +25,14 @@ func (s *Server) setupUpgrade(root echoswagger.ApiRoot, base string) {
 		AddResponse(http.StatusOK, ``, nil, nil)
 
 	g.GET("/update_list", s.updateModelList).
-		SetOperationId(`更新项目模型列表`).
-		AddParamQuery("", "url", "模型列表路径", true).
-		SetDescription(`更新项目模型列表`).
+		SetOperationId(`更新项目资源列表`).
+		AddParamQuery("", "url", "资源列表路径", true).
+		SetDescription(`更新项目资源列表`).
 		AddResponse(http.StatusOK, ``, nil, nil)
 
-	g.GET("/model_list", s.getModelList).
-		SetOperationId(`获取模型列表`).
-		SetDescription(`获取模型列表`).
+	g.GET("/source_list", s.getSourceList).
+		SetOperationId(`获取资源列表`).
+		SetDescription(`获取资源列表`).
 		AddResponse(http.StatusOK, ``, nil, nil)
 
 	g.GET("/detail", s.getUpgradeLogDetail).
@@ -86,15 +86,15 @@ func (s *Server) updateModelList(c echo.Context) error {
 
 	list, err := s.upgrade.UpdateModelList(url)
 	if err != nil {
-		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInternalServerCode, "获取模型列表失败", err))
+		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInternalServerCode, "获取资源列表失败", err))
 	}
 	return c.JSON(http.StatusOK, utils.SuccessJSONData(list))
 }
 
-func (s *Server) getModelList(c echo.Context) error {
+func (s *Server) getSourceList(c echo.Context) error {
 	list, err := s.upgrade.GetModelList()
 	if err != nil {
-		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInternalServerCode, "获取模型列表失败", err))
+		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInternalServerCode, "获取资源列表失败", err))
 	}
 	return c.JSON(http.StatusOK, utils.SuccessJSONData(list))
 }

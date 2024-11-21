@@ -7,12 +7,11 @@
       <Card>
         <p slot="title">
           <Icon type="ios-list"></Icon>
-          模型升级日志列表
+          资源升级日志
         </p>
         <div slot="extra">
-          <Button icon="md-sync" type="primary" @click="methodOnSynchronization">同步数据模型</Button>
-          <Button icon="md-add" type="primary" @click="methodOnUpgrade">升级数据模型</Button>
-          <Button icon="md-arrow-back" type="primary" @click="methodOnCreateTask">返回部署</Button>
+          <Button icon="md-sync" type="primary" @click="methodOnSynchronization">同步数据资源</Button>
+          <Button icon="md-add" type="primary" @click="methodOnUpgrade">升级数据资源</Button>
         </div>
         <Table :columns="columns" :data="datas" max-height="1000" border>
           <template slot-scope="{ row }" slot="action">
@@ -26,7 +25,7 @@
   </Layout>
   <Modal
     v-model="synchronizationModal"
-    title="数据模型同步"
+    title="资源同步"
     width="1024"
     @on-ok="methodOnClickSynchronization"
     >
@@ -42,7 +41,7 @@
   </Modal>
   <Modal
     v-model="upgradeModal"
-    title="算法模型升级"
+    title="资源升级"
     width="1024"
     @on-ok="methodOnClickUpgrade"
     >
@@ -58,8 +57,8 @@
           <FormItem label="密码" prop="password">
             <Input v-model="upgrade_vars.password" placeholder=""></Input>
           </FormItem>
-          <FormItem label="数据模型名称" prop="project_name">
-            <Select v-model="model_list_index" @on-change="methodOnModelListChange" :disabled="load_ok" placeholder="优先同步数据模型">
+          <FormItem label="数据资源名称" prop="project_name">
+            <Select v-model="model_list_index" @on-change="methodOnModelListChange" :disabled="load_ok" placeholder="优先同步数据资源">
               <Option v-for="(item, index) in modelList" :key="item.project_name" :value="index">
                 {{ item.project_name }}
               </Option>
@@ -114,9 +113,9 @@ export default {
       upgradeModal: false,
       synchronizationModal: false,
       upgrade_vars: {
-        remote_ip: '10.1.3.46:22',
+        remote_ip: '192.168.8.244:22',
         user: 'root',
-        password: '123456',
+        password: 'password',
         project_name: ''
       },
       modelList: [],
@@ -139,11 +138,11 @@ export default {
           { required: false, message: '模块资源路径不能为空', trigger: 'blur' }
         ],
         project_name: [
-          { required: true, message: '数据模型名称不能为空', trigger: 'blur' }
+          { required: true, message: '数据资源名称不能为空', trigger: 'blur' }
         ]
       },
       columns: [{
-        title: '数据模型名称',
+        title: '数据资源名称',
         key: 'ProjectName'
       },
       {
@@ -172,13 +171,13 @@ export default {
           }
         }
       },
-      host: '10.1.3.46:22',
+      host: '192.168.8.244:22',
       isDevelopment: process.env.NODE_ENV !== 'production'
     }
   },
   created () {
     if (this.isDevelopment) {
-      this.host = '10.1.3.46:22'
+      this.host = '192.168.8.244:22'
     } else {
       this.host = location.host
     }
@@ -188,9 +187,6 @@ export default {
     this.methodFetchModelList()
   },
   methods: {
-    methodOnCreateTask () {
-      this.$router.push({ path: '/' })
-    },
     methodOnUpgrade () {
       this.upgradeModal = true
       this.model_list_index = -1
