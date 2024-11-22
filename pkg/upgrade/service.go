@@ -13,11 +13,11 @@ import (
 	"github.com/kiga-hub/data-transmission/pkg/utils"
 )
 
-// UpdateModelList -
-func (s *Client) UpdateModelList(url string) ([]*SourceConfig, error) {
+// UpdateSourceList -
+func (s *Client) UpdateSourceList(url string) ([]*SourceConfig, error) {
 	start := time.Now()
 	defer func() {
-		s.logger.Info("GetModelList cost time: ", time.Since(start))
+		s.logger.Info("GetSourceList cost time: ", time.Since(start))
 	}()
 
 	localPath := "./source.json"
@@ -33,11 +33,11 @@ func (s *Client) UpdateModelList(url string) ([]*SourceConfig, error) {
 	return sourceConfig, nil
 }
 
-// GetModelList -
-func (s *Client) GetModelList() ([]*SourceConfig, error) {
+// GetSourceList -
+func (s *Client) GetSourceList() ([]*SourceConfig, error) {
 	start := time.Now()
 	defer func() {
-		s.logger.Info("GetModelList cost time: ", time.Since(start))
+		s.logger.Info("GetSourceList cost time: ", time.Since(start))
 	}()
 
 	localPath := "./source.json"
@@ -46,11 +46,11 @@ func (s *Client) GetModelList() ([]*SourceConfig, error) {
 	return sourceConfig, nil
 }
 
-// StartUpgrade -
-func (s *Client) StartUpgrade(param *Req) error {
+// StartTransmission -
+func (s *Client) StartTransmission(param *Req) error {
 
-	s.logger.Info("start upgrade param: ", param)
-	upgradeDir := s.config.Dir
+	s.logger.Info("start tramsmission param: ", param)
+	sourceDir := s.config.Dir
 	remoteTarget, err := NewRemoteTarget(param, s.logger)
 	if err != nil {
 		s.logger.Errorf("Failed to create SSH client at target IP: %v", err)
@@ -59,7 +59,7 @@ func (s *Client) StartUpgrade(param *Req) error {
 
 	defer remoteTarget.Close()
 
-	err = remoteTarget.CheckRemoteDirectory(upgradeDir)
+	err = remoteTarget.CheckRemoteDirectory(sourceDir)
 	if err != nil {
 		remoteTarget.redirect.Printf("Failed to check remote directory: %v", err)
 		s.logger.Info("err: ", err)
@@ -76,18 +76,18 @@ func (s *Client) StartUpgrade(param *Req) error {
 
 	s.logger.Info("source: ", sourceConfig)
 
-	remoteTargetModelLibPath := path.Join(upgradeDir, path.Base(sourceConfig.Source))
+	remoteTargetSourcePath := path.Join(sourceDir, path.Base(sourceConfig.Source))
 
-	remoteTarget.redirect.Printf("\nremoteTargetModelLibPath: %s\n", remoteTargetModelLibPath)
-	s.logger.Infof("remoteTargetModelLibPath: %s\n", remoteTargetModelLibPath)
+	remoteTarget.redirect.Printf("\remoteTargetSourcePath: %s\n", remoteTargetSourcePath)
+	s.logger.Infof("remoteTargetSourcePath: %s\n", remoteTargetSourcePath)
 
-	remoteModelLibFile := sourceConfig.Source
+	remoteSourceFile := sourceConfig.Source
 
 	/*--------------------download file------------------------*/
 
-	err = remoteTarget.DownloadTarball2Remote(remoteModelLibFile, upgradeDir)
+	err = remoteTarget.DownloadTarball2Remote(remoteSourceFile, sourceDir)
 	if err != nil {
-		remoteTarget.redirect.Printf("Failed to download %s tarball to remote: %v", remoteModelLibFile, err)
+		remoteTarget.redirect.Printf("Failed to download %s tarball to remote: %v", remoteSourceFile, err)
 		s.logger.Info("err: ", err)
 		return err
 	}
@@ -97,11 +97,11 @@ func (s *Client) StartUpgrade(param *Req) error {
 
 	/*---------------------extract tarball and backup the preversion file ----------------------*/
 
-	backUpDir := path.Join(upgradeDir, "old")
-	// model lib
-	err = remoteTarget.UpgradeRemoteModels(remoteTargetModelLibPath, upgradeDir, backUpDir)
+	backUpDir := path.Join(sourceDir, "old")
+	// source tarbal
+	err = remoteTarget.TransmitRemoteSource(remoteTargetSourcePath, sourceDir, backUpDir)
 	if err != nil {
-		remoteTarget.redirect.Printf("Failed to upgrade models: %v", err)
+		remoteTarget.redirect.Printf("Failed to transmit source: %v", err)
 		s.logger.Info("err: ", err)
 		return err
 	}
@@ -131,8 +131,8 @@ func (s *Client) StartUpgrade(param *Req) error {
 
 	/*---------------------remove tarball-----------------------*/
 
-	// model lib
-	err = remoteTarget.RemoveRemoteFile(remoteTargetModelLibPath)
+	// source tarbal
+	err = remoteTarget.RemoveRemoteFile(remoteTargetSourcePath)
 	if err != nil {
 		remoteTarget.redirect.Printf("Failed to remove tarball: %v", err)
 		s.logger.Info("err: ", err)
@@ -150,8 +150,8 @@ func (s *Client) StartUpgrade(param *Req) error {
 	// }
 
 	/*--------------------------------------------*/
-	s.logger.Info("Upgrade completed successfully")
-	remoteTarget.redirect.Printf("Upgrade completed successfully")
+	s.logger.Info("Transmission completed successfully")
+	remoteTarget.redirect.Printf("Transmission completed successfully")
 
 	return nil
 }
@@ -167,7 +167,7 @@ type Detail struct {
 func (s *Client) GetLogDetail(projectName, date string) (*Detail, error) {
 	start := time.Now()
 	defer func() {
-		s.logger.Info("GetUpgradeDetail cost time: ", time.Since(start))
+		s.logger.Info("GetTransmissionDetail cost time: ", time.Since(start))
 	}()
 
 	baseDir := "./upgrade_log"
@@ -227,21 +227,21 @@ func (s *Client) GetLogList() ([]*LogList, error) {
 	}()
 
 	dir := "./upgrade_log"
-	modelDirs, err := utils.ListDir(dir)
+	sourceDirs, err := utils.ListDir(dir)
 	if err != nil {
 		return nil, err
 	}
 
 	list := make([]*LogList, 0)
-	for _, modelDir := range modelDirs {
-		modelPath := filepath.Join(dir, modelDir)
-		dateDirs, err := utils.ListDir(modelPath)
+	for _, sourceDir := range sourceDirs {
+		sourcePath := filepath.Join(dir, sourceDir)
+		dateDirs, err := utils.ListDir(sourcePath)
 		if err != nil {
 			return nil, err
 		}
 		for _, dateDir := range dateDirs {
 			list = append(list, &LogList{
-				ProjectName: modelDir,
+				ProjectName: sourceDir,
 				Date:        dateDir,
 			})
 		}

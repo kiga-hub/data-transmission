@@ -614,8 +614,8 @@ func (s *RemoteTarget) CreateRemoteDirectories(destDir, backupDir string) error 
 	return nil
 }
 
-// UpgradeRemoteModels -
-func (s *RemoteTarget) UpgradeRemoteModels(packagePath, destDir, backupDir string) error {
+// TransmitRemoteSource -
+func (s *RemoteTarget) TransmitRemoteSource(packagePath, destDir, backupDir string) error {
 	err := s.CreateRemoteDirectories(destDir, backupDir)
 	if err != nil {
 		return err

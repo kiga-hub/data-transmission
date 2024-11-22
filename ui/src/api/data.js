@@ -1,6 +1,6 @@
 import axios from '@/libs/api.request'
 
-export const updateModelList = (query) => {
+export const updateSourceList = (query) => {
   return axios.request({
     url: '/upgrade/update_list',
     method: 'get',
@@ -8,7 +8,7 @@ export const updateModelList = (query) => {
   })
 }
 
-export const getModelList = () => {
+export const getSourceList = () => {
   return axios.request({
     url: '/upgrade/source_list',
     method: 'get'

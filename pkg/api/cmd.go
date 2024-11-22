@@ -9,59 +9,59 @@ import (
 	"github.com/pangpanglabs/echoswagger/v2"
 )
 
-func (s *Server) setupUpgrade(root echoswagger.ApiRoot, base string) {
-	g := root.Group("升级", base+"/upgrade")
+func (s *Server) setupTransmission(root echoswagger.ApiRoot, base string) {
+	g := root.Group("Transmission", base+"/upgrade")
 
-	g.POST("/start", s.startUpgrade).
-		SetOperationId(`升级`).
+	g.POST("/start", s.startTransmission).
+		SetOperationId(`transmission`).
 		AddParamBody(upgrade.Req{}, "param", "", true).
-		SetSummary("升级").
-		SetDescription(`升级`).
+		SetSummary("transmission").
+		SetDescription(`transmission`).
 		AddResponse(http.StatusOK, ``, nil, nil)
 
-	g.GET("/log_list", s.getUpgradeLogList).
-		SetOperationId(`获取升级列表`).
-		SetDescription(`获取升级列表`).
+	g.GET("/log_list", s.getTransmissionLogList).
+		SetOperationId(`get transmission list`).
+		SetDescription(`get transmission list`).
 		AddResponse(http.StatusOK, ``, nil, nil)
 
-	g.GET("/update_list", s.updateModelList).
-		SetOperationId(`更新项目资源列表`).
-		AddParamQuery("", "url", "资源列表路径", true).
-		SetDescription(`更新项目资源列表`).
+	g.GET("/update_list", s.updateSourceList).
+		SetOperationId(`update data source list`).
+		AddParamQuery("", "url", "source list url", true).
+		SetDescription(`update data source list`).
 		AddResponse(http.StatusOK, ``, nil, nil)
 
 	g.GET("/source_list", s.getSourceList).
-		SetOperationId(`获取资源列表`).
-		SetDescription(`获取资源列表`).
+		SetOperationId(`get source list`).
+		SetDescription(`get source list`).
 		AddResponse(http.StatusOK, ``, nil, nil)
 
-	g.GET("/detail", s.getUpgradeLogDetail).
-		SetOperationId(`获取升级详情`).
+	g.GET("/detail", s.getTransmissionLogDetail).
+		SetOperationId(`get transmission detail`).
 		AddParamQuery("", "project_name", "", true).
 		AddParamQuery("", "date", "", true).
-		SetSummary("获取升级详情").
-		SetDescription(`获取升级详情`).
+		SetSummary("get transmission detail").
+		SetDescription(`get transmission detail`).
 		AddResponse(http.StatusOK, ``, nil, nil)
 
-	g.DELETE("/delete", s.deleteUpgradeLogDetail).
-		SetOperationId(`删除日志`).
+	g.DELETE("/delete", s.deleteTransmissionLogDetail).
+		SetOperationId(`delete detail log`).
 		AddParamQuery("", "project_name", "", true).
 		AddParamQuery("", "date", "", true).
-		SetSummary("删除日志").
-		SetDescription(`删除日志`).
+		SetSummary("delete detail log").
+		SetDescription(`delete detail log`).
 		AddResponse(http.StatusOK, ``, nil, nil)
 }
 
-func (s *Server) startUpgrade(c echo.Context) error {
+func (s *Server) startTransmission(c echo.Context) error {
 	param := &upgrade.Req{}
 	if err := c.Bind(param); err != nil {
 		return c.JSON(http.StatusOK, err)
 	}
 
-	s.logger.Info("start upgrade", param)
+	s.logger.Info("start transmission", param)
 
 	go func() {
-		err := s.upgrade.StartUpgrade(param)
+		err := s.upgrade.StartTransmission(param)
 		if err != nil {
 			s.logger.Error(err)
 		}
@@ -70,66 +70,66 @@ func (s *Server) startUpgrade(c echo.Context) error {
 	return c.JSON(http.StatusOK, utils.SuccessJSONData("OK"))
 }
 
-func (s *Server) getUpgradeLogList(c echo.Context) error {
+func (s *Server) getTransmissionLogList(c echo.Context) error {
 	list, err := s.upgrade.GetLogList()
 	if err != nil {
-		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInternalServerCode, "获取任务列表失败", err))
+		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInternalServerCode, "get transmission list failed", err))
 	}
 	return c.JSON(http.StatusOK, utils.SuccessJSONData(list))
 }
 
-func (s *Server) updateModelList(c echo.Context) error {
+func (s *Server) updateSourceList(c echo.Context) error {
 	url := c.QueryParam("url")
 	if url == "" {
-		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInvalidRequestParamsCode, "参数错误", nil))
+		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInvalidRequestParamsCode, "invalid params", nil))
 	}
 
-	list, err := s.upgrade.UpdateModelList(url)
+	list, err := s.upgrade.UpdateSourceList(url)
 	if err != nil {
-		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInternalServerCode, "获取资源列表失败", err))
+		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInternalServerCode, "update source list failed", err))
 	}
 	return c.JSON(http.StatusOK, utils.SuccessJSONData(list))
 }
 
 func (s *Server) getSourceList(c echo.Context) error {
-	list, err := s.upgrade.GetModelList()
+	list, err := s.upgrade.GetSourceList()
 	if err != nil {
-		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInternalServerCode, "获取资源列表失败", err))
+		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInternalServerCode, "get source list failed", err))
 	}
 	return c.JSON(http.StatusOK, utils.SuccessJSONData(list))
 }
 
-func (s *Server) getUpgradeLogDetail(c echo.Context) error {
+func (s *Server) getTransmissionLogDetail(c echo.Context) error {
 	date := c.QueryParam("date")
 	if date == "" {
-		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInvalidRequestParamsCode, "参数错误", nil))
+		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInvalidRequestParamsCode, "invalid params", nil))
 	}
 
 	projectName := c.QueryParam("project_name")
 	if projectName == "" {
-		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInvalidRequestParamsCode, "参数错误", nil))
+		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInvalidRequestParamsCode, "invalid params", nil))
 	}
 
 	detail, err := s.upgrade.GetLogDetail(projectName, date)
 	if err != nil {
-		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInternalServerCode, "获取升级详情失败", err))
+		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInternalServerCode, "get data transmission detail failed", err))
 	}
 	return c.JSON(http.StatusOK, utils.SuccessJSONData(detail))
 }
 
-func (s Server) deleteUpgradeLogDetail(c echo.Context) error {
+func (s Server) deleteTransmissionLogDetail(c echo.Context) error {
 	date := c.QueryParam("date")
 	if date == "" {
-		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInvalidRequestParamsCode, "参数错误", nil))
+		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInvalidRequestParamsCode, "invalid params", nil))
 	}
 
 	projectName := c.QueryParam("project_name")
 	if projectName == "" {
-		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInvalidRequestParamsCode, "参数错误", nil))
+		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInvalidRequestParamsCode, "invalid params", nil))
 	}
 
 	if err := s.upgrade.DeleteLogDetail(projectName, date); err != nil {
-		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInternalServerCode, "删除日志失败", err))
+		return c.JSON(http.StatusOK, utils.FailJSONData(utils.ErrInternalServerCode, "delete logs failed", err))
 	}
 	return c.JSON(http.StatusOK, utils.SuccessJSONData("OK"))
 }

@@ -37,7 +37,6 @@ func (c *DataTransmissionComponent) PreInit(ctx context.Context) error {
 
 // Init the component
 func (c *DataTransmissionComponent) Init(server *micro.Server) (err error) {
-	// 获取日志
 	c.logger = server.GetElement(&micro.LoggingElementKey).(logging.ILogger)
 
 	if c.upgrade, err = upgrade.New(
@@ -47,7 +46,6 @@ func (c *DataTransmissionComponent) Init(server *micro.Server) (err error) {
 		return err
 	}
 
-	// api 接口初始化
 	c.api = api.New(
 		api.WithLogger(c.logger),
 		api.WithUpgrade(c.upgrade),
@@ -71,7 +69,6 @@ func (c *DataTransmissionComponent) OnConfigChanged(*platformConf.NodeConfig) er
 
 // SetupHandler of echo if the component need
 func (c *DataTransmissionComponent) SetupHandler(root echoswagger.ApiRoot, base string) error {
-	// 安装路由
 	root.Echo().Static("/", "./ui/dist")
 	root.Echo().Static("/static", "./ui/dist/static")
 	c.api.Setup(root, base)

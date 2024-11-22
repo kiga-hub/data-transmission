@@ -7,16 +7,16 @@
       <Card>
         <p slot="title">
           <Icon type="ios-list"></Icon>
-          资源升级日志
+          Upgrade log of resources
         </p>
         <div slot="extra">
-          <Button icon="md-sync" type="primary" @click="methodOnSynchronization">同步数据资源</Button>
-          <Button icon="md-add" type="primary" @click="methodOnUpgrade">升级数据资源</Button>
+          <Button icon="md-sync" type="primary" @click="methodOnSynchronization">Synchronize data resources</Button>
+          <Button icon="md-add" type="primary" @click="methodOnUpgrade">Upgrade data resources</Button>
         </div>
         <Table :columns="columns" :data="datas" max-height="1000" border>
           <template slot-scope="{ row }" slot="action">
-            <Button type="success" size="small" @click="methodGetUpgradeLogDetail(row)">查看</Button>
-            <Button type="error" size="small" @click="methodDeleteUpgradeLogDetail(row)">删除</Button>
+            <Button type="success" size="small" @click="methodGetUpgradeLogDetail(row)">View</Button>
+            <Button type="error" size="small" @click="methodDeleteUpgradeLogDetail(row)">Delete</Button>
           </template>
         </Table>
       </Card>
@@ -25,14 +25,14 @@
   </Layout>
   <Modal
     v-model="synchronizationModal"
-    title="资源同步"
+    title="Resource Synchronization"
     width="1024"
     @on-ok="methodOnClickSynchronization"
     >
     <Row type="flex" justify="center" :gutter="32">
       <Col style="margin: 20px;">
         <Form :model="synchronization_vars" label-position="left" ref="basic" :rules="synchronizationRuleValidate">
-          <FormItem label="服务器同步地址" prop="url">
+          <FormItem label="Server Synchronization Address" prop="url">
             <Input v-model="synchronization_vars.url" placeholder=""></Input>
           </FormItem>
         </Form>
@@ -41,25 +41,25 @@
   </Modal>
   <Modal
     v-model="upgradeModal"
-    title="资源升级"
+    title="Resource Upgrade"
     width="1024"
     @on-ok="methodOnClickUpgrade"
     >
     <Row type="flex" justify="center" :gutter="32">
       <Col style="margin: 20px;">
         <Form :model="upgrade_vars" label-position="left" ref="basic" :rules="upgradeRuleValidate">
-          <FormItem label="服务器升级地址" prop="remote_ip">
+          <FormItem label="Server upgrade address" prop="remote_ip">
             <Input v-model="upgrade_vars.remote_ip" placeholder=""></Input>
           </FormItem>
-          <FormItem label="用户名" prop="user">
+          <FormItem label="Username" prop="user">
             <Input v-model="upgrade_vars.user" placeholder=""></Input>
           </FormItem>
-          <FormItem label="密码" prop="password">
+          <FormItem label="Password" prop="password">
             <Input v-model="upgrade_vars.password" placeholder=""></Input>
           </FormItem>
-          <FormItem label="数据资源名称" prop="project_name">
-            <Select v-model="model_list_index" @on-change="methodOnModelListChange" :disabled="load_ok" placeholder="优先同步数据资源">
-              <Option v-for="(item, index) in modelList" :key="item.project_name" :value="index">
+          <FormItem label="Data Resource Name" prop="project_name">
+            <Select v-model="source_list_index" @on-change="methodOnSourceListChange" :disabled="load_ok" placeholder="Prioritize synchronizing data resources">
+              <Option v-for="(item, index) in sourceList" :key="item.project_name" :value="index">
                 {{ item.project_name }}
               </Option>
             </Select>
@@ -75,14 +75,14 @@
     width="1024"
     footer-hide>
     <Tabs value="log">
-      <TabPane label="日志" name="log">
+      <TabPane label="Logs" name="log">
         <Card v-if="detail.Log">
           <div class="markdown-container" id="log_div">
             <markdown-it-vue class="markdown-body" :content="detail.Log" :options="options" />
           </div>
         </Card>
       </TabPane>
-      <TabPane label="配置" name="config">
+      <TabPane label="Configure" name="config">
         <Card v-if="detail.Config">
           <div class="markdown-container">
             <json-viewer :value="detail.Config" class="markdown-body"></json-viewer>
@@ -98,7 +98,7 @@
 import MarkdownItVue from 'markdown-it-vue'
 import 'markdown-it-vue/dist/markdown-it-vue.css'
 import {
-  getUpgradeList, getUpgradeDetail, startUpgrade, deleteUpgradeDetail, updateModelList, getModelList
+  getUpgradeList, getUpgradeDetail, startUpgrade, deleteUpgradeDetail, updateSourceList, getSourceList
 } from '@/api/data'
 
 export default {
@@ -109,7 +109,7 @@ export default {
   data () {
     return {
       load_ok: true,
-      model_list_index: -1,
+      source_list_index: -1,
       upgradeModal: false,
       synchronizationModal: false,
       upgrade_vars: {
@@ -118,39 +118,39 @@ export default {
         password: 'password',
         project_name: ''
       },
-      modelList: [],
+      sourceList: [],
       synchronization_vars: {
         url: 'http://192.168.8.244:4567/download/source.json'
       },
       synchronizationRuleValidate: {
         url: [
-          { required: true, message: '服务器同步地址不能为空', trigger: 'blur' }
+          { required: true, message: 'The server synchronization address cannot be empty', trigger: 'blur' }
         ]
       },
       upgradeRuleValidate: {
         remote_ip: [
-          { required: true, message: '升级服务器IP不能为空', trigger: 'blur' }
+          { required: true, message: 'The server synchronization address cannot be empty', trigger: 'blur' }
         ],
         user: [
-          { required: false, message: '项目名不能为空', trigger: 'blur' }
+          { required: false, message: 'The username cannot be empty', trigger: 'blur' }
         ],
         password: [
-          { required: false, message: '模块资源路径不能为空', trigger: 'blur' }
+          { required: false, message: 'The password cannot be empty', trigger: 'blur' }
         ],
         project_name: [
-          { required: true, message: '数据资源名称不能为空', trigger: 'blur' }
+          { required: true, message: 'The data resource name cannot be empty', trigger: 'blur' }
         ]
       },
       columns: [{
-        title: '数据资源名称',
+        title: 'Data Resource Name',
         key: 'ProjectName'
       },
       {
-        title: '升级日期',
+        title: 'Upgrade Date',
         key: 'Date'
       },
       {
-        title: '操作',
+        title: 'Actions',
         slot: 'action',
         width: 150,
         align: 'center'
@@ -184,26 +184,26 @@ export default {
   },
   mounted () {
     this.methodGetUpgradeLogList()
-    this.methodFetchModelList()
+    this.methodFetchSourcelList()
   },
   methods: {
     methodOnUpgrade () {
       this.upgradeModal = true
-      this.model_list_index = -1
-      console.log('--------------------', this.load_ok)
+      this.source_list_index = -1
+      console.log('methodOnUpgrade', this.load_ok)
     },
-    async methodFetchModelList () {
+    async methodFetchSourcelList () {
       try {
-        const response = await getModelList()
-        this.modelList = response.data.data
-        console.log('Model list:', this.modelList)
+        const response = await getSourceList()
+        this.sourceList = response.data.data
+        console.log('Source list:', this.sourceList)
       } catch (error) {
-        console.error('Failed to fetch model list:', error)
+        console.error('Failed to fetch source list:', error)
       }
     },
-    methodOnModelListChange (index) {
-      console.log('++++++++++++++++++++++++++++', this.load_ok)
-      if (this.modelList.length === 0) {
+    methodOnSourceListChange (index) {
+      console.log('methodOnSourceListChange', this.load_ok)
+      if (this.sourceList.length === 0) {
         this.methodOnClickSynchronization().then(() => {
           this.updateProjectName(index)
         })
@@ -212,25 +212,25 @@ export default {
       }
     },
     updateProjectName (index) {
-      if (index >= 0 && index < this.modelList.length) {
-        this.upgrade_vars.project_name = this.modelList[index].project_name
+      if (index >= 0 && index < this.sourceList.length) {
+        this.upgrade_vars.project_name = this.sourceList[index].project_name
         console.log('Project name updated to:', this.upgrade_vars.project_name)
       } else {
         console.error('Invalid index:', index)
       }
     },
     methodOnClickSynchronization () {
-      this.methodUpdateModelList()
-      console.log('**********************', this.load_ok)
+      this.methodUpdateSourcelList()
+      console.log('methodOnClickSynchronization', this.load_ok)
     },
-    methodUpdateModelList () {
-      console.log('methodUpdateModelList called', this.synchronization_vars)
-      updateModelList(this.synchronization_vars).then(res => {
+    methodUpdateSourcelList () {
+      console.log('methodUpdateSourcelList called', this.synchronization_vars)
+      updateSourceList(this.synchronization_vars).then(res => {
         if (res.data.code !== 200) {
           this.$Message.error(res.data.msg)
         }
-        console.log('Model list updated:', res.data.data)
-        this.modelList = res.data.data
+        console.log('Source list updated:', res.data.data)
+        this.sourceList = res.data.data
         this.load_ok = false
       })
       // window.location.reload()
@@ -297,7 +297,7 @@ export default {
         }
 
         _this.detail = res.data.data
-        _this.detailTitle = '升级时间 - ' + params.date
+        _this.detailTitle = 'Upgrade Time - ' + params.date
       })
 
       // setInterval(function () {
@@ -324,7 +324,6 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .layout{
     border: 1px solid #d7dde4;
