@@ -77,19 +77,19 @@ vim data-transmission.toml
 
 ## API 
 
-![api](api.png)
+![api](static/api.png)
 
 ## UI
 
-![main](main.png)
+![main](static/main.png)
 
-![sync](synchronization.png)
+![sync](static/synchronization.png)
 
-![upgrade](upgrade.png)
+![upgrade](static/upgrade.png)
 
-![view](view.png)
+![view](static/view.png)
 
-![config](config.png)
+![config](static/config.png)
 
 
 ## Example
